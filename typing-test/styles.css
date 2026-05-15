@@ -135,7 +135,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 40px 24px;
+  padding: 20px 24px;
 }
 
 .screen {
@@ -144,7 +144,7 @@ html, body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 36px;
+  gap: 24px;
   animation: fadeInUp 0.5s ease both;
 }
 
@@ -194,8 +194,8 @@ html, body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 110px;
-  height: 110px;
+  width: 90px;
+  height: 90px;
   border-radius: var(--radius-lg);
   border: 1.5px solid var(--border);
   background: var(--bg-card);
@@ -227,7 +227,7 @@ html, body {
 }
 
 .time-num {
-  font-size: 2.4rem;
+  font-size: 2rem;
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1;

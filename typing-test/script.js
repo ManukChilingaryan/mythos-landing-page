@@ -61,6 +61,44 @@ let correctChars   = 0;
 let incorrectChars = 0;
 let startTimestamp = null;
 
+// ─── Audio ────────────────────────────────────────────────────────────────────
+let audioCtx = null;
+
+function initAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+function playSound(type) {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
+  
+  osc.connect(gainNode);
+  gainNode.connect(audioCtx.destination);
+  
+  if (type === 'correct') {
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(0.03, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.05);
+  } else if (type === 'error') {
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.1);
+    gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.1);
+  }
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 spawnParticles();
 
@@ -101,6 +139,7 @@ function goToStart() {
 }
 
 function beginTest() {
+  initAudio();
   totalTime  = selectedTime;
   timeLeft   = selectedTime;
   started    = false;
@@ -161,8 +200,22 @@ function handleInput() {
     startTimer();
   }
 
-  // Figure out what changed
   const newLen = typed.length;
+
+  // Append new passage if we reached the end of the text
+  while (newLen >= charSpans.length) {
+    const newText = ' ' + PASSAGES[Math.floor(Math.random() * PASSAGES.length)];
+    currentPassage += newText;
+    
+    newText.split('').forEach((ch) => {
+      const span = document.createElement('span');
+      span.classList.add('char');
+      span.textContent = ch === ' ' ? '\u00A0' : ch;
+      span.dataset.char = ch;
+      charSpans.push(span);
+      textBox.appendChild(span);
+    });
+  }
 
   // Rebuild from scratch each time (simple & reliable)
   correctChars   = 0;
@@ -185,14 +238,20 @@ function handleInput() {
     }
   });
 
+  // Play sound for the newly typed character
+  if (newLen > currentIndex) {
+    const typedChar = typed[newLen - 1];
+    const expectedChar = charSpans[newLen - 1].dataset.char;
+    if (typedChar === expectedChar) {
+      playSound('correct');
+    } else {
+      playSound('error');
+    }
+  }
+
   currentIndex = newLen;
   updateStats();
   scrollToCurrentChar();
-
-  // Auto-advance when passage is fully typed
-  if (newLen >= charSpans.length) {
-    endTest();
-  }
 }
 
 function scrollToCurrentChar() {
