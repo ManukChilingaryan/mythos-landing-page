@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TypeFlux — Typing Speed Test</title>
+  <meta name="description" content="Test your typing speed and accuracy with TypeFlux. Choose 1, 2, or 5 minute sessions." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Background particles -->
+  <div class="bg-particles" id="bgParticles"></div>
+
+  <div class="app-wrapper">
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">⌨</span>
+        <span class="logo-text">TypeFlux</span>
+      </div>
+      <div class="header-stats" id="headerStats" style="display:none;">
+        <div class="live-stat">
+          <span class="live-label">WPM</span>
+          <span class="live-value" id="liveWpm">0</span>
+        </div>
+        <div class="live-stat">
+          <span class="live-label">ACC</span>
+          <span class="live-value" id="liveAcc">100%</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="main">
+
+      <!-- Start Screen -->
+      <section class="screen" id="startScreen">
+        <div class="start-hero">
+          <h1 class="hero-title">How fast do <span class="gradient-text">you type?</span></h1>
+          <p class="hero-sub">Choose a duration and find out your WPM & accuracy in real time.</p>
+        </div>
+
+        <div class="time-selector">
+          <button class="time-btn active" id="btn1" data-time="60">
+            <span class="time-num">1</span>
+            <span class="time-unit">min</span>
+          </button>
+          <button class="time-btn" id="btn2" data-time="120">
+            <span class="time-num">2</span>
+            <span class="time-unit">min</span>
+          </button>
+          <button class="time-btn" id="btn5" data-time="300">
+            <span class="time-num">5</span>
+            <span class="time-unit">min</span>
+          </button>
+        </div>
+
+        <button class="start-btn" id="startBtn">
+          <span>Start Test</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </section>
+
+      <!-- Test Screen -->
+      <section class="screen hidden" id="testScreen">
+
+        <!-- Timer bar -->
+        <div class="timer-area">
+          <div class="timer-display" id="timerDisplay">60</div>
+          <div class="timer-bar-track">
+            <div class="timer-bar-fill" id="timerBar"></div>
+          </div>
+        </div>
+
+        <!-- Text to type -->
+        <div class="text-box" id="textBox" aria-label="Text to type">
+          <!-- Characters injected by JS -->
+        </div>
+
+        <!-- Input area -->
+        <div class="input-area">
+          <textarea
+            id="typingInput"
+            class="typing-input"
+            placeholder="Start typing here…"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <!-- Live stats bar -->
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-icon">🚀</div>
+            <div class="stat-info">
+              <span class="stat-value" id="wpmDisplay">0</span>
+              <span class="stat-label">WPM</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎯</div>
+            <div class="stat-info">
+              <span class="stat-value" id="accDisplay">100%</span>
+              <span class="stat-label">Accuracy</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+              <span class="stat-value" id="correctDisplay">0</span>
+              <span class="stat-label">Correct</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">❌</div>
+            <div class="stat-info">
+              <span class="stat-value" id="errorsDisplay">0</span>
+              <span class="stat-label">Errors</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="restart-btn" id="restartBtn">↺ Restart</button>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Results Modal -->
+  <div class="modal-overlay hidden" id="resultsModal">
+    <div class="modal-card">
+      <div class="modal-glow"></div>
+      <div class="modal-header">
+        <div class="trophy-icon">🏆</div>
+        <h2 class="modal-title">Test Complete!</h2>
+        <p class="modal-subtitle" id="modalSubtitle">Here's how you did</p>
+      </div>
+
+      <div class="results-grid">
+        <div class="result-item primary">
+          <span class="result-value" id="finalWpm">0</span>
+          <span class="result-label">Words Per Minute</span>
+        </div>
+        <div class="result-item">
+          <span class="result-value" id="finalAcc">0%</span>
+          <span class="result-label">Accuracy</span>
+        </div>
+        <div class="result-item">
+          <span class="result-value" id="finalCorrect">0</span>
+          <span class="result-label">Correct Chars</span>
+        </div>
+        <div class="result-item">
+          <span class="result-value" id="finalErrors">0</span>
+          <span class="result-label">Mistakes</span>
+        </div>
+        <div class="result-item">
+          <span class="result-value" id="finalWords">0</span>
+          <span class="result-label">Words Typed</span>
+        </div>
+        <div class="result-item">
+          <span class="result-value" id="finalTime">0s</span>
+          <span class="result-label">Duration</span>
+        </div>
+      </div>
+
+      <div class="rating-badge" id="ratingBadge">
+        <span id="ratingText">Good job!</span>
+      </div>
+
+      <div class="modal-actions">
+        <button class="action-btn primary" id="tryAgainBtn">↺ Try Again</button>
+        <button class="action-btn secondary" id="newTestBtn">New Test</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
